@@ -2,38 +2,38 @@ class AuthManager {
   constructor() {
     this.tokenKey = 'sara_token';
     this.userKey = 'sara_user';
+    this.apiBase = ''; // Use relative paths
   }
 
-  
   setUser(user, token) {
     localStorage.setItem(this.userKey, JSON.stringify(user));
     localStorage.setItem(this.tokenKey, token);
   }
 
-  // Get current user
   getCurrentUser() {
     const userStr = localStorage.getItem(this.userKey);
     return userStr ? JSON.parse(userStr) : null;
   }
 
-  // Get token
   getToken() {
     return localStorage.getItem(this.tokenKey);
   }
 
-  // Check if user is logged in
   isLoggedIn() {
     return !!this.getToken();
   }
 
-  // Logout
   logout() {
     localStorage.removeItem(this.userKey);
     localStorage.removeItem(this.tokenKey);
-    window.location.href = '/';
+    // Use SPA navigation instead of full page reload
+    if (typeof loadPage === 'function') {
+      loadPage('login.html');
+    } else {
+      window.location.href = 'login.html';
+    }
   }
 
-  // Get headers with auth token
   getAuthHeaders() {
     const token = this.getToken();
     return {
@@ -41,7 +41,6 @@ class AuthManager {
       'Authorization': `Bearer ${token}`
     };
   }
-
 
   async verifyToken() {
     const token = this.getToken();
@@ -55,10 +54,75 @@ class AuthManager {
       });
       return response.ok;
     } catch (error) {
+      console.error('Token verification failed:', error);
       return false;
+    }
+  }
+
+  async login(email, password) {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Login failed');
+      }
+
+      const data = await response.json();
+      this.setUser(data.user, data.token);
+      
+      // Use SPA navigation
+      if (typeof loadPage === 'function') {
+        loadPage('index.html');
+      } else {
+        window.location.href = 'index.html';
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
+  }
+
+  async register(userData) {
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Registration failed');
+      }
+
+      const data = await response.json();
+      this.setUser(data.user, data.token);
+      
+      // Use SPA navigation
+      if (typeof loadPage === 'function') {
+        loadPage('index.html');
+      } else {
+        window.location.href = 'index.html';
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
     }
   }
 }
 
-
 const authManager = new AuthManager();
+window.authManager = authManager;
