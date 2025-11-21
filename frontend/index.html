@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#dc2626">
+  <title>SARA — Smart Road Assistance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <header class="header">
+      <nav class="navbar">
+        <a href="/home" class="logo">
+          <img src="/images/logo.jpeg" alt="SARA Logo" class="logo-img" onerror="this.style.display='none'">
+          <span class="logo-text">SARA</span>
+        </a>
+        <div class="user-menu">
+          <span id="userName" class="user-name"></span>
+          <button id="logoutBtn" class="btn btn-sm btn-secondary">Logout</button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      <section class="hero">
+        <div class="hero-logo">
+          <img src="/images/logo.jpeg" alt="SARA Logo" class="hero-logo-img" onerror="this.style.display='none'">
+        </div>
+        <h1>Smart Road Assistance</h1>
+        <p>Find nearby mechanics or register your workshop to help others in need</p>
+      </section>
+
+      <section class="stats-section">
+        <div class="stats-single">
+          <div class="stat-card">
+            <div class="stat-icon">🔧</div>
+            <div class="stat-content">
+              <div class="stat-number" id="totalMechanics">0</div>
+              <div class="stat-label">Registered Mechanics</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    
+     
+
+      <section class="feature-grid">
+        <a href="/mechanics.html" class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>Find Mechanics</h3>
+          <p>Search nearby mechanics by location, service, or name with smart search</p>
+        </a>
+
+        <a href="/register.html" class="feature-card">
+          <div class="feature-icon">🛠️</div>
+          <h3>Register Workshop</h3>
+          <p>List your garage to help stranded drivers and grow your business</p>
+        </a>
+      </section>
+       <section class="emergency-section">
+        <h2 class="section-title">Emergency Contacts</h2>
+        <div class="emergency-grid">
+          <div class="emergency-card police" onclick="callEmergency('100')">
+            <div class="emergency-icon">🚓</div>
+            <div class="emergency-content">
+              <h3>Police</h3>
+              <p>Emergency Response</p>
+              <div class="emergency-number">100</div>
+            </div>
+          </div>
+
+          <div class="emergency-card ambulance" onclick="callEmergency('108')">
+            <div class="emergency-icon">🚑</div>
+            <div class="emergency-content">
+              <h3>Ambulance</h3>
+              <p>Medical Emergency</p>
+              <div class="emergency-number">108</div>
+            </div>
+          </div>
+
+          
+
+          
+
+          <div class="emergency-card road" onclick="callEmergency('1033')">
+            <div class="emergency-icon">🛣️</div>
+            <div class="emergency-content">
+              <h3>Road Help</h3>
+              <p>Highway Assistance</p>
+              <div class="emergency-number">1033</div>
+            </div>
+          </div>
+
+         
+        </div>
+      </section>
+      <section class="text-center mb-3">
+        <h2 class="mb-1">Trusted by Drivers Nationwide</h2>
+        <p class="text-light">Quick assistance when you need it most</p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <p>Built by Mareeswari</p>
+        <p>Your reliable partner on the road</p>
+      </div>
+    </footer>
+
+    <nav class="bottom-nav">
+      <a href="/home" class="nav-item active">
+        <div class="nav-icon">🏠</div>
+        <span>Home</span>
+      </a>
+      <a href="/mechanics.html" class="nav-item">
+        <div class="nav-icon">🔧</div>
+        <span>Mechanics</span>
+      </a>
+      <a href="/emergency.html" class="nav-item">
+        <div class="nav-icon">🚨</div>
+        <span>Emergency</span>
+      </a>
+      <a href="/register.html" class="nav-item">
+        <div class="nav-icon">📝</div>
+        <span>Register</span>
+      </a>
+      
+    </nav>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      if (!authManager.isLoggedIn()) {
+        window.location.href = '/';
+        return;
+      }
+
+      const user = authManager.getCurrentUser();
+      if (user) {
+        document.getElementById('userName').textContent = `Hello, ${user.name}`;
+      }
+
+      await loadStatistics();
+
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        authManager.logout();
+      });
+
+      document.getElementById('logoutNav').addEventListener('click', (e) => {
+        e.preventDefault();
+        authManager.logout();
+      });
+    });
+
+    async function loadStatistics() {
+      try {
+        const response = await fetch('/api/auth/stats');
+        
+        if (response.ok) {
+          const stats = await response.json();
+          document.getElementById('totalMechanics').textContent = stats.totalMechanics;
+        } else {
+          document.getElementById('totalMechanics').textContent = '50+';
+        }
+      } catch (error) {
+        document.getElementById('totalMechanics').textContent = '50+';
+      }
+    }
+
+    function callEmergency(number) {
+      if (confirm(`Call ${number}? This will open your phone dialer.`)) {
+        window.location.href = `tel:${number}`;
+      }
+    }
+  </script>
+</body>
+</html>

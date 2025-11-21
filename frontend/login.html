@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#dc2626">
+  <title>Login — SARA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <nav class="navbar">
+        <a href="/" class="logo">
+          <img src="/images/logo.jpeg" alt="SARA Logo" class="logo-img" onerror="this.style.display='none'">
+          <span class="logo-text">SARA</span>
+        </a>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      <section class="hero">
+        <div class="hero-logo">
+          <img src="/images/logo.jpeg" alt="SARA Logo" class="hero-logo-img" onerror="this.style.display='none'">
+        </div>
+        <h1>Smart Road Assistance</h1>
+        <p>Login to find nearby mechanics or register your workshop</p>
+      </section>
+
+      <section class="form-container">
+        <form id="loginForm" class="auth-form">
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input type="email" id="email" class="form-input" required placeholder="Enter your email">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password *</label>
+            <input type="password" id="password" class="form-input" required placeholder="Enter your password" minlength="6">
+          </div>
+
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-full">Login</button>
+          </div>
+
+          <div class="text-center">
+            <p class="text-light">Don't have an account? <a href="#" id="showRegister">Sign up</a></p>
+          </div>
+
+          <div id="message" class="message"></div>
+        </form>
+
+        <form id="registerForm" class="auth-form" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" id="regName" class="form-input" required placeholder="Enter your full name">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input type="email" id="regEmail" class="form-input" required placeholder="Enter your email">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" id="regPhone" class="form-input" placeholder="Enter your phone number">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password *</label>
+            <input type="password" id="regPassword" class="form-input" required placeholder="Create a password (min. 6 characters)" minlength="6">
+          </div>
+
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+          </div>
+
+          <div class="text-center">
+            <p class="text-light">Already have an account? <a href="#" id="showLogin">Login</a></p>
+          </div>
+
+          <div id="regMessage" class="message"></div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <p>Built with ❤️ — SARA • Smart Road Assistance</p>
+        <p>Your reliable partner on the road</p>
+      </div>
+    </footer>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    document.getElementById('showRegister').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('registerForm').style.display = 'block';
+    });
+
+    document.getElementById('showLogin').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('registerForm').style.display = 'none';
+      document.getElementById('loginForm').style.display = 'block';
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const messageEl = document.getElementById('message');
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      
+      submitBtn.textContent = 'Logging in...';
+      submitBtn.disabled = true;
+      messageEl.textContent = '';
+      messageEl.className = 'message';
+
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          authManager.setUser(data.user, data.token);
+          messageEl.className = 'message message-success';
+          messageEl.textContent = 'Login successful! Redirecting...';
+          
+          setTimeout(() => {
+            window.location.href = '/home';
+          }, 1000);
+        } else {
+          messageEl.className = 'message message-error';
+          messageEl.textContent = data.error || 'Login failed';
+        }
+      } catch (error) {
+        messageEl.className = 'message message-error';
+        messageEl.textContent = 'Network error. Please try again.';
+      } finally {
+        submitBtn.textContent = 'Login';
+        submitBtn.disabled = false;
+      }
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const name = document.getElementById('regName').value;
+      const email = document.getElementById('regEmail').value;
+      const phone = document.getElementById('regPhone').value;
+      const password = document.getElementById('regPassword').value;
+      const messageEl = document.getElementById('regMessage');
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      
+      submitBtn.textContent = 'Creating Account...';
+      submitBtn.disabled = true;
+      messageEl.textContent = '';
+      messageEl.className = 'message';
+
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name, email, phone, password }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          authManager.setUser(data.user, data.token);
+          messageEl.className = 'message message-success';
+          messageEl.textContent = 'Account created successfully! Redirecting...';
+          
+          setTimeout(() => {
+            window.location.href = '/home';
+          }, 1000);
+        } else {
+          messageEl.className = 'message message-error';
+          messageEl.textContent = data.error || 'Registration failed';
+        }
+      } catch (error) {
+        messageEl.className = 'message message-error';
+        messageEl.textContent = 'Network error. Please try again.';
+      } finally {
+        submitBtn.textContent = 'Create Account';
+        submitBtn.disabled = false;
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (authManager.isLoggedIn()) {
+        window.location.href = '/home';
+      }
+    });
+  </script>
+</body>
+</html>

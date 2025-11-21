@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset='utf-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover'>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#dc2626">
+  <title>Find Mechanics — SARA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <nav class="navbar">
+        <a href="/home" class="logo">
+          <img src="/images/logo.jpeg" alt="SARA Logo" class="logo-img" onerror="this.style.display='none'">
+          <span class="logo-text">SARA</span>
+        </a>
+        <div class="user-menu">
+          <span id="userName" class="user-name"></span>
+          <button id="logoutBtn" class="btn btn-sm btn-secondary">Logout</button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      <div class="mb-2">
+        <a href="/home" class="btn btn-secondary mb-2">← Back to Home</a>
+        <h1 class="mb-1">Find Mechanics</h1>
+        <p class="text-light">Get help from nearby workshops</p>
+      </div>
+
+      <section class="search-section">
+        <div class="search-bar">
+          <input type="text" id="q" class="search-input" placeholder="Search mechanics...">
+          <button id="shareLoc" class="btn btn-primary">📍</button>
+        </div>
+        
+        <div class="filter-row">
+          <div class="filter-group">
+            <label for="service">Service:</label>
+            <select id="service" class="filter-select">
+              <option value="">All Services</option>
+              <option value="flat_tire">Flat Tire</option>
+              <option value="battery">Battery</option>
+              <option value="fuel">Fuel</option>
+              <option value="towing">Towing</option>
+              <option value="engine">Engine</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section id="list" class="mechanics-list">
+        <div class="loading">Finding mechanics...</div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <a href="/home" class="nav-item">
+        <div class="nav-icon">🏠</div>
+        <span>Home</span>
+      </a>
+      <a href="/mechanics.html" class="nav-item active">
+        <div class="nav-icon">🔧</div>
+        <span>Mechanics</span>
+      </a>
+        <a href="/emergency.html" class="nav-item active">
+        <div class="nav-icon">🚨</div>
+        <span>Emergency</span>
+      </a>
+      <a href="/register.html" class="nav-item">
+        <div class="nav-icon">📝</div>
+        <span>Register</span>
+      </a>
+     
+    </nav>
+  </div>
+
+  <template id="itemT">
+    <div class="mechanic-card">
+      <div class="mechanic-header">
+        <div class="mechanic-info">
+          <div class="mechanic-name"></div>
+          <div class="mechanic-location"></div>
+          <div class="mechanic-email"></div>
+        </div>
+      </div>
+      
+      <div class="mechanic-services"></div>
+      
+      <div class="mechanic-actions">
+        <a class="btn btn-secondary btn-sm">🗺️ Map</a>
+        <a class="btn btn-whatsapp btn-sm">💬 Chat</a>
+        <a class="btn btn-primary btn-sm call">📞 Call</a>
+      </div>
+    </div>
+  </template>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!authManager.isLoggedIn()) {
+        window.location.href = '/';
+        return;
+      }
+
+      const user = authManager.getCurrentUser();
+      if (user) {
+        document.getElementById('userName').textContent = `Hello, ${user.name}`;
+      }
+
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        authManager.logout();
+      });
+
+      document.getElementById('logoutNav').addEventListener('click', (e) => {
+        e.preventDefault();
+        authManager.logout();
+      });
+    });
+
+    const listEl = document.getElementById('list');
+    const qInput = document.getElementById('q');
+    const serviceEl = document.getElementById('service');
+    const tpl = document.getElementById('itemT');
+
+    let myLoc = null;
+
+    function buildQuery(){
+      const params = new URLSearchParams();
+      if(qInput.value.trim()) params.set('q', qInput.value.trim());
+      if(serviceEl.value) params.set('service', serviceEl.value);
+      if(myLoc){ params.set('lat', myLoc.lat); params.set('lng', myLoc.lng); }
+      return params.toString() ? '/api/mechanics?' + params.toString() : '/api/mechanics';
+    }
+
+    async function fetchList(){
+      listEl.innerHTML = '<div class="loading">Searching...</div>';
+      const url = buildQuery();
+      
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        let rows = data;
+        
+        if(!rows.length){
+          listEl.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">🔧</div>
+              <h3>No mechanics found</h3>
+              <p>Try adjusting your search</p>
+            </div>
+          `;
+          return;
+        }
+        
+        listEl.innerHTML = '';
+        rows.forEach(r => {
+          const el = tpl.content.cloneNode(true);
+          el.querySelector('.mechanic-name').textContent = r.name;
+          el.querySelector('.mechanic-location').textContent = (r.address ? r.address + ' • ' : '') + (r.city || '');
+          
+          const emailEl = el.querySelector('.mechanic-email');
+          if (r.email) {
+            emailEl.textContent = r.email;
+            emailEl.style.color = '#6b7280';
+            emailEl.style.fontSize = '0.75rem';
+            emailEl.style.marginTop = '0.25rem';
+          } else {
+            emailEl.style.display = 'none';
+          }
+          
+          const servicesEl = el.querySelector('.mechanic-services');
+          (r.services || []).forEach(s => {
+            const serviceTag = document.createElement('span');
+            serviceTag.className = 'service-tag';
+            serviceTag.textContent = s.replace('_', ' ');
+            servicesEl.appendChild(serviceTag);
+          });
+          
+          const dir = myLoc ? 
+            `https://www.google.com/maps/dir/?api=1&origin=${myLoc.lat},${myLoc.lng}&destination=${r.lat},${r.lng}` : 
+            `https://www.google.com/maps?q=${r.lat},${r.lng}`;
+          
+          el.querySelector('.btn-secondary').href = dir;
+          el.querySelector('.btn-whatsapp').href = `https://wa.me/${(r.phone||'').replace(/\D/g,'')}?text=${encodeURIComponent('Hi ' + r.name + ', I need vehicle help')}`;
+          el.querySelector('.call').href = `tel:${(r.phone||'').replace(/\s+/g,'')}`;
+          
+          listEl.appendChild(el);
+        });
+      } catch (error) {
+        listEl.innerHTML = '<div class="message message-error">Network error. Try again.</div>';
+      }
+    }
+
+    qInput.addEventListener('input', () => fetchList());
+    serviceEl.addEventListener('change', () => fetchList());
+
+    document.getElementById('shareLoc').addEventListener('click', () => {
+      if(!navigator.geolocation){ 
+        alert('Location not supported'); 
+        return; 
+      }
+      
+      const btn = document.getElementById('shareLoc');
+      btn.textContent = '📍...';
+      btn.disabled = true;
+
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          myLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          btn.textContent = '📍✓';
+          btn.classList.add('btn-success');
+          fetchList();
+        }, 
+        () => {
+          alert('Location access denied');
+          btn.textContent = '📍';
+          btn.disabled = false;
+        }
+      );
+    });
+
+    fetchList();
+  </script>
+</body>
+</html>

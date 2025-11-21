@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset='utf-8'>
+  <meta name='viewport' content='width=device-width,initial-scale=1'>
+  <title>Register Workshop — SARA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <nav class="navbar">
+        <a href="/home" class="logo">
+          <img src="/images/logo.jpeg" alt="SARA Logo" class="logo-img" onerror="this.style.display='none'">
+          <span class="logo-text">SARA</span>
+        </a>
+        <div class="user-menu">
+          <span id="userName" class="user-name"></span>
+          <button id="logoutBtn" class="btn btn-sm btn-secondary">Logout</button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      <div class="mb-2">
+        <a href="/home" class="btn btn-secondary mb-2">← Back to Home</a>
+        <h1 class="mb-1">Register Your Workshop</h1>
+        <p class="text-light">Join our network and help drivers in need</p>
+      </div>
+
+      <form id="regForm" class="form-container">
+        <div class="form-group">
+          <label class="form-label">Workshop Name *</label>
+          <input type="text" name="name" class="form-input" required placeholder="Enter your workshop name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Phone Number *</label>
+          <input type="tel" name="phone" class="form-input" required placeholder="+91 9876543210">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" name="email" class="form-input" placeholder="Enter workshop email (optional)">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">City</label>
+            <input type="text" name="city" class="form-input" placeholder="Enter city">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Street</label>
+            <input type="text" name="street" class="form-input" placeholder="Enter street">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Full Address</label>
+          <textarea name="address" class="form-textarea" placeholder="Enter complete address"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Services Offered *</label>
+          <input type="text" name="services" class="form-input" required placeholder="flat_tire, battery, towing, engine, fuel">
+          <small class="text-light">Separate services with commas</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Latitude</label>
+            <input type="number" step="any" name="lat" class="form-input" placeholder="13.0827">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Longitude</label>
+            <input type="number" step="any" name="lng" class="form-input" placeholder="80.2707">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary btn-full">Register Workshop</button>
+          <button type="button" id="locBtn" class="btn btn-secondary btn-full mt-1">📍 Use My Current Location</button>
+        </div>
+
+        <div id="msg"></div>
+      </form>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <p>Grow your business with SARA</p>
+        <p>Reach more customers in your area</p>
+      </div>
+    </footer>
+
+    <nav class="bottom-nav">
+      <a href="/home" class="nav-item">
+        <div class="nav-icon">🏠</div>
+        <span>Home</span>
+      </a>
+      <a href="/mechanics.html" class="nav-item">
+        <div class="nav-icon">🔧</div>
+        <span>Mechanics</span>
+      </a>
+      <a href="/register.html" class="nav-item active">
+        <div class="nav-icon">📝</div>
+        <span>Register</span>
+      </a>
+      
+    </nav>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!authManager.isLoggedIn()) {
+        window.location.href = '/';
+        return;
+      }
+
+      const user = authManager.getCurrentUser();
+      if (user) {
+        document.getElementById('userName').textContent = `Hello, ${user.name}`;
+      }
+
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        authManager.logout();
+      });
+
+      document.getElementById('logoutNav').addEventListener('click', (e) => {
+        e.preventDefault();
+        authManager.logout();
+      });
+    });
+
+    document.getElementById('regForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      
+      submitBtn.textContent = 'Registering...';
+      submitBtn.disabled = true;
+
+      const f = new FormData(e.target);
+      const body = {};
+      for(const [k, v] of f.entries()) body[k] = v;
+      
+      if(body.services) {
+        body.services = body.services.split(',').map(s => s.trim()).filter(Boolean);
+      }
+
+      try {
+        const res = await fetch('/api/mechanics', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(body)
+        });
+        
+        const msgEl = document.getElementById('msg');
+        if(res.ok) {
+          msgEl.className = 'message message-success';
+          msgEl.textContent = '✅ Workshop registered successfully! Thank you for joining SARA.';
+          e.target.reset();
+        } else {
+          const j = await res.json();
+          msgEl.className = 'message message-error';
+          msgEl.textContent = '❌ Error: ' + (j.error || res.statusText);
+        }
+      } catch(err) {
+        document.getElementById('msg').className = 'message message-error';
+        document.getElementById('msg').textContent = '❌ Network error. Please check your connection.';
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+
+    document.getElementById('locBtn').addEventListener('click', () => {
+      if(!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser');
+        return;
+      }
+      
+      const btn = document.getElementById('locBtn');
+      const originalText = btn.textContent;
+      btn.textContent = 'Getting location...';
+      btn.disabled = true;
+
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          document.querySelector('[name=lat]').value = pos.coords.latitude.toFixed(6);
+          document.querySelector('[name=lng]').value = pos.coords.longitude.toFixed(6);
+          btn.textContent = '📍 Location Set!';
+          btn.classList.add('btn-success');
+        },
+        () => {
+          alert('Could not get your location. Please enable location services.');
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }
+      );
+    });
+  </script>
+</body>
+</html>

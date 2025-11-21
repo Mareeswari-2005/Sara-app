@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#dc2626">
+  <title>Emergency Contacts — SARA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <nav class="navbar">
+        <a href="/home" class="logo">
+          <img src="/images/logo.jpeg" alt="SARA Logo" class="logo-img" onerror="this.style.display='none'">
+          <span class="logo-text">SARA</span>
+        </a>
+        <div class="user-menu">
+          <span id="userName" class="user-name"></span>
+          <button id="logoutBtn" class="btn btn-sm btn-secondary">Logout</button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      <div class="mb-2">
+        <a href="/home" class="btn btn-secondary mb-2">← Back to Home</a>
+        <h1 class="mb-1">Emergency Contacts</h1>
+        <p class="text-light">Immediate help when you need it most</p>
+      </div>
+
+      <!-- Emergency Quick Actions -->
+      <section class="emergency-section">
+        <div class="emergency-grid">
+          <div class="emergency-card police" onclick="callEmergency('100')">
+            <div class="emergency-icon">🚓</div>
+            <div class="emergency-content">
+              <h3>Police</h3>
+              <p>Emergency Response</p>
+              <div class="emergency-number">100</div>
+            </div>
+          </div>
+
+          <div class="emergency-card ambulance" onclick="callEmergency('108')">
+            <div class="emergency-icon">🚑</div>
+            <div class="emergency-content">
+              <h3>Ambulance</h3>
+              <p>Medical Emergency</p>
+              <div class="emergency-number">108</div>
+            </div>
+          </div>
+
+          <div class="emergency-card fire" onclick="callEmergency('101')">
+            <div class="emergency-icon">🚒</div>
+            <div class="emergency-content">
+              <h3>Fire Service</h3>
+              <p>Fire Emergency</p>
+              <div class="emergency-number">101</div>
+            </div>
+          </div>
+
+          <div class="emergency-card women" onclick="callEmergency('1091')">
+            <div class="emergency-icon">👩‍💼</div>
+            <div class="emergency-content">
+              <h3>Women Helpline</h3>
+              <p>Women Safety</p>
+              <div class="emergency-number">1091</div>
+            </div>
+          </div>
+
+          <div class="emergency-card road" onclick="callEmergency('1033')">
+            <div class="emergency-icon">🛣️</div>
+            <div class="emergency-content">
+              <h3>Road Help</h3>
+              <p>Highway Assistance</p>
+              <div class="emergency-number">1033</div>
+            </div>
+          </div>
+
+          
+
+         
+
+          <div class="emergency-card senior" onclick="callEmergency('14567')">
+            <div class="emergency-icon">👴</div>
+            <div class="emergency-content">
+              <h3>Senior Citizens</h3>
+              <p>Elderly Help</p>
+              <div class="emergency-number">14567</div>
+            </div>
+          </div>
+
+          
+
+
+      
+      <section class="emergency-info">
+        <h2 class="section-title">Emergency Guidelines</h2>
+        <div class="info-grid">
+          <div class="info-card">
+            <h3>🚨 In Case of Accident</h3>
+            <ul>
+              <li>Call Police (100) immediately</li>
+              <li>Call Ambulance (108) if injured</li>
+              <li>Move to safe location if possible</li>
+              <li>Use hazard lights and warning triangle</li>
+            </ul>
+          </div>
+
+          <div class="info-card">
+            <h3>🆘 Roadside Emergency</h3>
+            <ul>
+              <li>Pull over to safe location</li>
+              <li>Use our mechanics finder for help</li>
+              <li>Call road help (1033) for highways</li>
+              <li>Keep emergency kit accessible</li>
+            </ul>
+          </div>
+
+          <div class="info-card">
+            <h3>📱 Important Tips</h3>
+            <ul>
+              <li>Save emergency numbers in phone</li>
+              <li>Keep first aid kit in vehicle</li>
+              <li>Share location with trusted contacts</li>
+              <li>Always wear seatbelt</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <p>Built by Mareeswari</p>
+        <p>Your safety is our priority</p>
+      </div>
+    </footer>
+
+    <nav class="bottom-nav">
+      <a href="/home" class="nav-item">
+        <div class="nav-icon">🏠</div>
+        <span>Home</span>
+      </a>
+      <a href="/mechanics.html" class="nav-item">
+        <div class="nav-icon">🔧</div>
+        <span>Mechanics</span>
+      </a>
+      <a href="/emergency.html" class="nav-item active">
+        <div class="nav-icon">🚨</div>
+        <span>Emergency</span>
+      </a>
+      <a href="/register.html" class="nav-item">
+        <div class="nav-icon">📝</div>
+        <span>Register</span>
+      </a>
+     
+    </nav>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!authManager.isLoggedIn()) {
+        window.location.href = '/';
+        return;
+      }
+
+      const user = authManager.getCurrentUser();
+      if (user) {
+        document.getElementById('userName').textContent = `Hello, ${user.name}`;
+      }
+
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        authManager.logout();
+      });
+
+      document.getElementById('logoutNav').addEventListener('click', (e) => {
+        e.preventDefault();
+        authManager.logout();
+      });
+    });
+
+    function callEmergency(number) {
+      if (confirm(`Call ${number}? This will open your phone dialer.`)) {
+        window.location.href = `tel:${number}`;
+      }
+    }
+  </script>
+</body>
+</html>
