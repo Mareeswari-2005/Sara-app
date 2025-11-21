@@ -32,30 +32,30 @@ const authRouter = require('./routes/auth');
 app.use('/api/mechanics', mechanicsRouter);
 app.use('/api/auth', authRouter);
 
-app.use(express.static('frontend'));
+app.use(express.static('public'));
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'login.html'));
+  res.sendFile(path.join(__dirname, 'public','login.html'));
 });
 
 app.get('/home', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
+  res.sendFile(path.join(__dirname,'public', 'index.html'));
 });
 
 app.get('/mechanics.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'mechanics.html'));
+  res.sendFile(path.join(__dirname, 'public', 'mechanics.html'));
 });
 
 app.get('/register.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'register.html'));
+  res.sendFile(path.join(__dirname, 'public','register.html'));
 });
 
 app.get('/emergency.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'emergency.html'));
+  res.sendFile(path.join(__dirname, 'public',  'emergency.html'));
 });
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'login.html'));
+  res.sendFile(path.join(__dirname,'public', 'login.html'));
 });
 
 const PORT = process.env.PORT || 3000;
