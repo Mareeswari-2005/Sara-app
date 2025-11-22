@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Mechanic = require('../models/Mechanic');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'sara-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'sara-secret-key-change-in-production';
 
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -27,9 +27,13 @@ router.post('/register', async (req, res) => {
   try {
     const { email, password, name, phone } = req.body;
 
+    if (!email || !password || !name) {
+      return res.status(400).json({ error: 'Name, email and password are required' });
+    }
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
+      return res.status(400).json({ error: 'User already exists with this email' });
     }
 
     const user = new User({
@@ -58,7 +62,7 @@ router.post('/register', async (req, res) => {
       }
     });
   } catch (err) {
-    console.error(err);
+    console.error('Registration error:', err);
     res.status(500).json({ error: 'Server error during registration' });
   }
 });
@@ -66,6 +70,10 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
 
     const user = await User.findOne({ email });
     if (!user) {
@@ -94,7 +102,7 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (err) {
-    console.error(err);
+    console.error('Login error:', err);
     res.status(500).json({ error: 'Server error during login' });
   }
 });
@@ -116,14 +124,10 @@ router.get('/check', authenticateToken, (req, res) => {
   res.json({ authenticated: true, user: req.user });
 });
 
-// Updated stats endpoint - only total mechanics
 router.get('/stats', async (req, res) => {
   try {
     const totalMechanics = await Mechanic.countDocuments();
-    
-    res.json({
-      totalMechanics
-    });
+    res.json({ totalMechanics });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });

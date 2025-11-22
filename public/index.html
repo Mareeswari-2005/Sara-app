@@ -1,186 +1,111 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#dc2626">
-  <title>SARA — Smart Road Assistance</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SARA - Auto Service Partner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow: hidden;
+        }
+        
+        .splash-container {
+            text-align: center;
+            animation: fadeIn 1.5s ease-in;
+        }
+        
+        .logo {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 48px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .logo-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .loading-bar {
+            width: 200px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        
+        .loading-progress {
+            width: 0%;
+            height: 100%;
+            background: white;
+            border-radius: 2px;
+            animation: loading 3s ease-in-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes loading {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+    </style>
 </head>
 <body>
-  <div class="app-container">
-    
-    <header class="header">
-      <nav class="navbar">
-        <a href="/home" class="logo">
-          <img src="/images/logo.jpeg" alt="SARA Logo" class="logo-img" onerror="this.style.display='none'">
-          <span class="logo-text">SARA</span>
-        </a>
-        <div class="user-menu">
-          <span id="userName" class="user-name"></span>
-          <button id="logoutBtn" class="btn btn-sm btn-secondary">Logout</button>
+    <div class="splash-container">
+        <div class="logo">
+            <img src="/images/logo.jpeg" alt="SARA Logo" class="logo-img" onerror="this.innerHTML='🚗'">
         </div>
-      </nav>
-    </header>
-
-    <main class="main-content">
-      <section class="hero">
-        <div class="hero-logo">
-          <img src="/images/logo.jpeg" alt="SARA Logo" class="hero-logo-img" onerror="this.style.display='none'">
+        <h1>SARA</h1>
+        <p class="tagline">Smart Auto Service Partner</p>
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
         </div>
-        <h1>Smart Road Assistance</h1>
-        <p>Find nearby mechanics or register your workshop to help others in need</p>
-      </section>
+    </div>
 
-      <section class="stats-section">
-        <div class="stats-single">
-          <div class="stat-card">
-            <div class="stat-icon">🔧</div>
-            <div class="stat-content">
-              <div class="stat-number" id="totalMechanics">0</div>
-              <div class="stat-label">Registered Mechanics</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-    
-     
-
-      <section class="feature-grid">
-        <a href="/mechanics.html" class="feature-card">
-          <div class="feature-icon">🔍</div>
-          <h3>Find Mechanics</h3>
-          <p>Search nearby mechanics by location, service, or name with smart search</p>
-        </a>
-
-        <a href="/register.html" class="feature-card">
-          <div class="feature-icon">🛠️</div>
-          <h3>Register Workshop</h3>
-          <p>List your garage to help stranded drivers and grow your business</p>
-        </a>
-      </section>
-       <section class="emergency-section">
-        <h2 class="section-title">Emergency Contacts</h2>
-        <div class="emergency-grid">
-          <div class="emergency-card police" onclick="callEmergency('100')">
-            <div class="emergency-icon">🚓</div>
-            <div class="emergency-content">
-              <h3>Police</h3>
-              <p>Emergency Response</p>
-              <div class="emergency-number">100</div>
-            </div>
-          </div>
-
-          <div class="emergency-card ambulance" onclick="callEmergency('108')">
-            <div class="emergency-icon">🚑</div>
-            <div class="emergency-content">
-              <h3>Ambulance</h3>
-              <p>Medical Emergency</p>
-              <div class="emergency-number">108</div>
-            </div>
-          </div>
-
-          
-
-          
-
-          <div class="emergency-card road" onclick="callEmergency('1033')">
-            <div class="emergency-icon">🛣️</div>
-            <div class="emergency-content">
-              <h3>Road Help</h3>
-              <p>Highway Assistance</p>
-              <div class="emergency-number">1033</div>
-            </div>
-          </div>
-
-         
-        </div>
-      </section>
-      <section class="text-center mb-3">
-        <h2 class="mb-1">Trusted by Drivers Nationwide</h2>
-        <p class="text-light">Quick assistance when you need it most</p>
-      </section>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-content">
-        <p>Built by Mareeswari</p>
-        <p>Your reliable partner on the road</p>
-      </div>
-    </footer>
-
-    <nav class="bottom-nav">
-      <a href="/home" class="nav-item active">
-        <div class="nav-icon">🏠</div>
-        <span>Home</span>
-      </a>
-      <a href="/mechanics.html" class="nav-item">
-        <div class="nav-icon">🔧</div>
-        <span>Mechanics</span>
-      </a>
-      <a href="/emergency.html" class="nav-item">
-        <div class="nav-icon">🚨</div>
-        <span>Emergency</span>
-      </a>
-      <a href="/register.html" class="nav-item">
-        <div class="nav-icon">📝</div>
-        <span>Register</span>
-      </a>
-      
-    </nav>
-  </div>
-
-  <script src="/js/auth.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async function() {
-      if (!authManager.isLoggedIn()) {
-        window.location.href = '/';
-        return;
-      }
-
-      const user = authManager.getCurrentUser();
-      if (user) {
-        document.getElementById('userName').textContent = `Hello, ${user.name}`;
-      }
-
-      await loadStatistics();
-
-      document.getElementById('logoutBtn').addEventListener('click', () => {
-        authManager.logout();
-      });
-
-      document.getElementById('logoutNav').addEventListener('click', (e) => {
-        e.preventDefault();
-        authManager.logout();
-      });
-    });
-
-    async function loadStatistics() {
-      try {
-        const response = await fetch('/api/auth/stats');
-        
-        if (response.ok) {
-          const stats = await response.json();
-          document.getElementById('totalMechanics').textContent = stats.totalMechanics;
-        } else {
-          document.getElementById('totalMechanics').textContent = '50+';
-        }
-      } catch (error) {
-        document.getElementById('totalMechanics').textContent = '50+';
-      }
-    }
-
-    function callEmergency(number) {
-      if (confirm(`Call ${number}? This will open your phone dialer.`)) {
-        window.location.href = `tel:${number}`;
-      }
-    }
-  </script>
+    <script>
+        setTimeout(() => {
+            window.location.href = '/login';  // Redirect back to main index (login page)
+        }, 3000);
+    </script>
 </body>
 </html>

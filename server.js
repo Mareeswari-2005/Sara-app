@@ -8,19 +8,15 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public'));
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  console.error('MONGODB_URI not found in .env file.');
-  process.exit(1);
-}
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/sara';
 
 mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-  .then(() => console.log('Connected to MongoDB Atlas'))
+  .then(() => console.log('Connected to MongoDB'))
   .catch(err => {
     console.error('MongoDB connection error:', err.message);
     process.exit(1);
@@ -34,28 +30,34 @@ app.use('/api/auth', authRouter);
 
 app.use(express.static('public'));
 
+
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public','login.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 app.get('/home', (req, res) => {
-  res.sendFile(path.join(__dirname,'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'home.html'));
 });
 
-app.get('/mechanics.html', (req, res) => {
+app.get('/mechanics', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'mechanics.html'));
 });
 
-app.get('/register.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public','register.html'));
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
 
-app.get('/emergency.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public',  'emergency.html'));
+app.get('/emergency', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'emergency.html'));
 });
+
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname,'public', 'login.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;

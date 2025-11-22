@@ -1,64 +1,30 @@
-class AuthManager {
-  constructor() {
-    this.tokenKey = 'sara_token';
-    this.userKey = 'sara_user';
-  }
-
-  
+const authManager = {
   setUser(user, token) {
-    localStorage.setItem(this.userKey, JSON.stringify(user));
-    localStorage.setItem(this.tokenKey, token);
-  }
+    localStorage.setItem('sara_user', JSON.stringify(user));
+    localStorage.setItem('sara_token', token);
+  },
 
-  // Get current user
   getCurrentUser() {
-    const userStr = localStorage.getItem(this.userKey);
+    const userStr = localStorage.getItem('sara_user');
     return userStr ? JSON.parse(userStr) : null;
-  }
+  },
 
-  // Get token
   getToken() {
-    return localStorage.getItem(this.tokenKey);
-  }
+    return localStorage.getItem('sara_token');
+  },
 
-  // Check if user is logged in
   isLoggedIn() {
-    return !!this.getToken();
-  }
+    return !!this.getToken() && !!this.getCurrentUser();
+  },
 
-  // Logout
-  logout() {
-    localStorage.removeItem(this.userKey);
-    localStorage.removeItem(this.tokenKey);
+ 
+
+logout() {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');
+    sessionStorage.removeItem('splashShown'); 
     window.location.href = '/';
-  }
-
-  // Get headers with auth token
-  getAuthHeaders() {
-    const token = this.getToken();
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    };
-  }
-
-
-  async verifyToken() {
-    const token = this.getToken();
-    if (!token) return false;
-
-    try {
-      const response = await fetch('/api/auth/check', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      return response.ok;
-    } catch (error) {
-      return false;
-    }
-  }
 }
+};
 
-
-const authManager = new AuthManager();
+window.authManager = authManager;
